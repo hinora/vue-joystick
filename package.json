@@ -1,0 +1,30 @@
+{
+    "name": "vue-joystick",
+    "version": "1.0.2",
+    "description": "simple joystick",
+    "main": "index.js",
+    "scripts": {
+        "serve": "vue-cli-service serve",
+        "build": "vue-cli-service build"
+    },
+    "keywords": [
+        "vue",
+        "joystick",
+        "joystick"
+    ],
+    "peerDependencies": {
+        "vue": "^2.6.10"
+    },
+    "devDependencies": {
+        "@vue/cli-service": "^3.11.0",
+        "node-sass": "^4.12.0",
+        "sass-loader": "^8.0.0",
+        "vue": "^2.6.10",
+        "vue-template-compiler": "^2.6.10"
+    },
+    "author": "huu mai",
+    "license": "MIT",
+    "browser": {
+        "./joy": "src/App.vue"
+    }
+}
