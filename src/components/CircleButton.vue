@@ -1,5 +1,8 @@
 <template>
-    <canvas :id="idCanvas"> </canvas>
+    <div style="-webkit-user-select: none;">
+        <canvas :id="idCanvas"></canvas>
+        <div>lenth:{{ this.lastLengthTouch }}</div>
+    </div>
 </template>
 <script>
 export default {
@@ -54,7 +57,10 @@ export default {
             movedX: 0,
             movedY: 0,
             movePressX: 0,
-            movePressY: 0
+            movePressY: 0,
+
+            touchNumber: -1,
+            lastLengthTouch: 0
         };
     },
     mounted() {
@@ -133,25 +139,36 @@ export default {
          * @description Events for manager touch
          */
         onTouchStart(event) {
-            this.movePressX = this.event.pageX - this.canvas.offsetLeft;
-            this.movePressY = this.event.pageY - this.canvas.offsetTop;
+            this.movePressX = event.pageX - this.canvas.offsetLeft;
+            this.movePressY = event.pageY - this.canvas.offsetTop;
             this.pressed = true;
+
+            this.touchNumber = event.touches.length - 1;
+            this.lastLengthTouch = event.touches.length;
         },
         onTouchMove(event) {
             // Prevent the browser from doing its default thing (scroll, zoom)
             event.preventDefault();
-            if (this.pressed) {
+            if (this.pressed && this.touchNumber != -1) {
+                if (this.lastLengthTouch < event.touches.length) {
+                    this.touchNumber = event.touches.length - 1;
+                    this.lastLengthTouch = event.touches.length;
+                } else if (this.lastLengthTouch > event.touches.length) {
+                    this.touchNumber = event.touches.length - 1;
+                    this.lastLengthTouch = event.touches.length;
+                }
+
                 let moveVectorX =
-                    event.touches[0].pageX -
+                    event.touches[this.touchNumber].pageX -
                     this.canvas.offsetLeft -
                     this.movePressX;
                 let moveVectorY =
-                    event.touches[0].pageY -
+                    event.touches[this.touchNumber].pageY -
                     this.canvas.offsetTop -
                     this.movePressY;
 
-                this.movedX = this.centerX + this.moveVectorX;
-                this.movedY = this.centerY + this.moveVectorY;
+                this.movedX = this.centerX + moveVectorX;
+                this.movedY = this.centerY + moveVectorY;
 
                 // Delete canvas
                 this.context.clearRect(
@@ -178,6 +195,9 @@ export default {
             this.drawInternal();
             this.move();
             //canvas.unbind('touchmove');
+
+            this.touchNumber = -1;
+            this.lastLengthTouch = 0;
         },
 
         /**
@@ -267,8 +287,8 @@ export default {
             }
 
             this.context.arc(
-                this.movedX?this.movedX:this.centerX,
-                this.movedY?this.movedY:this.centerY,
+                this.movedX ? this.movedX : this.centerX,
+                this.movedY ? this.movedY : this.centerY,
                 this.internalRadius,
                 0,
                 this.circumference,

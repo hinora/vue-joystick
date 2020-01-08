@@ -6,7 +6,12 @@
             :width="width"
             :height="height"
         ></SquareButton>
-        <button>AS</button>
+        <div>
+            <p>x: {{this.circleX}}</p>
+            <p>y: {{this.circleY}}</p>
+            <p>========================</p>
+            <p>speed: {{this.speed}}</p>
+        </div>
         <CircleButton
             style="border:1px solid red"
             @move="move"
@@ -29,14 +34,21 @@ export default {
         return{
             width:window.innerWidth/3,
             height:window.innerWidth/3,
+
+            circleX:0,
+            circleY:0,
+            speed:0,
         }
     },
     methods: {
         move(x, y) {
-            console.log(x, y);
+            this.circleX=x;
+            this.circleY=y;
+            // console.log(x, y);
         },
         moveSquare(y){
-            console.log(y);
+            // console.log(y);
+            this.speed=y;
         }
     }
 };
