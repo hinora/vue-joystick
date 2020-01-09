@@ -61,6 +61,7 @@ export default {
 }
 .controller-pad{
     display: flex;
+    -webkit-user-select: none;
     justify-content: space-between;
 }
 </style>
