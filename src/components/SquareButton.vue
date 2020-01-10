@@ -14,6 +14,10 @@ export default {
         },
         center: {
             type: Boolean,
+            default: false
+        },
+        holdPosition: {
+            type: Boolean,
             default: true
         },
         ratioButtonX: {
@@ -63,7 +67,8 @@ export default {
             centerX: 0,
             centerY: 0,
             movedY: 0,
-            movePressY: 0
+            movePressY: 0,
+            holdPositionY: 0
         };
     },
     mounted() {
@@ -87,12 +92,12 @@ export default {
                 this.maxMoveStickY = this.height / 2 - this.heightSquare / 2;
                 this.centerY = this.height / 2;
             } else {
-                this.maxMoveStickY = this.height - this.heightSquare / 2;
+                this.maxMoveStickY = this.height - this.heightSquare;
                 this.centerY = this.height - this.heightSquare / 2;
             }
 
             this.movedY = this.centerY;
-
+            this.holdPositionY = this.centerY;
             this.drawExternal();
             this.drawInternal();
         },
@@ -150,17 +155,17 @@ export default {
         onTouchMove(event) {
             // Prevent the browser from doing its default thing (scroll, zoom)
             event.preventDefault();
-            if (this.pressed && this.touchNumber != -1) {
-                this.jsonTest = JSON.stringify(event.touches);
-                
-
+            if (this.pressed) {
                 let moveVectorY =
                     event.changedTouches[0].pageY -
                     this.canvas.offsetTop -
                     this.movePressY;
 
-                this.movedY = this.centerY + moveVectorY;
-
+                if (this.holdPosition) {
+                    this.movedY = this.holdPositionY + moveVectorY;
+                } else {
+                    this.movedY = this.centerY + moveVectorY;
+                }
                 // Delete canvas
                 this.context.clearRect(
                     0,
@@ -177,7 +182,11 @@ export default {
         onTouchEnd(event) {
             this.pressed = false;
             // Reset position store variable
-            this.movedY = this.centerY;
+            if (!this.holdPosition) {
+                this.movedY = this.centerY;
+            } else {
+                this.holdPositionY = this.movedY;
+            }
             // Delete canvas
             this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
             // Redraw object
@@ -200,8 +209,11 @@ export default {
 
                 let moveVectorY =
                     event.pageY - this.canvas.offsetTop - this.movePressY;
-                this.movedY = this.centerY + moveVectorY;
-                console.log(moveVectorY);
+                if (this.holdPosition) {
+                    this.movedY = this.holdPositionY + moveVectorY;
+                } else {
+                    this.movedY = this.centerY + moveVectorY;
+                }
                 // Delete canvas
                 this.context.clearRect(
                     0,
@@ -218,7 +230,11 @@ export default {
         onMouseUp(event) {
             this.pressed = false;
             // Reset position store variable
-            this.movedY = this.centerY;
+            if (!this.holdPosition) {
+                this.movedY = this.centerY;
+            } else {
+                this.holdPositionY = this.movedY;
+            }
             // Delete canvas
             this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
             // Redraw object
@@ -258,17 +274,11 @@ export default {
                     this.movedY = this.centerY + this.maxMoveStickY;
                 }
             } else {
-                if (
-                    this.centerY - this.movedY + this.heightSquare / 2 >
-                    this.canvas.height - this.heightSquare / 2
-                ) {
-                    this.movedY =
-                        this.centerY -
-                        this.maxMoveStickY +
-                        this.heightSquare / 2;
+                if (this.centerY - this.movedY > this.maxMoveStickY) {
+                    this.movedY = this.centerY - this.maxMoveStickY;
                 }
 
-                if (this.movedY - this.centerY + this.heightSquare / 2 > 0) {
+                if (this.movedY - this.centerY > 0) {
                     this.movedY = this.centerY;
                 }
             }

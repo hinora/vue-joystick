@@ -145,7 +145,7 @@ export default {
         onTouchMove(event) {
             // Prevent the browser from doing its default thing (scroll, zoom)
             event.preventDefault();
-            if (this.pressed && this.touchNumber != -1) {
+            if (this.pressed) {
                 let moveVectorX =
                     event.changedTouches[0].pageX -
                     this.canvas.offsetLeft -
